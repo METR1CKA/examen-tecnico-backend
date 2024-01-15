@@ -25,7 +25,7 @@ El examen es el siguiente:
 
   - El campo que se usara para comparar entre servicios es el campo de referencia dentro del API contra el campo referencia de la base de datos. 
 
-  - Se agregaran los artículos  faltantes que vengan el el API dentro de la tabla XNPV_productos_proveedores
+  - Se agregaran los artículos faltantes que vengan en el API dentro de la tabla XNPV_productos_proveedores
 
   - Se actualizará la información de XNPV_productos_proveedores si la información ha cambiado, nombre, precio, stock, etc.
 

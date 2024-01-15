@@ -50,7 +50,7 @@ const databaseConfig: DatabaseConfig = {
       },
       seeders: {
         paths: [
-          './database/seeders/data'
+          './database/seeders/tables'
         ]
       },
       healthCheck: false,
