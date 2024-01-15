@@ -1,0 +1,155 @@
+import AuthSignUpValidator from 'App/Validators/Auth/AuthSignUpValidator'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import ValidatorException from 'App/Exceptions/ValidatorException'
+import Database from '@ioc:Adonis/Lucid/Database'
+import User from 'App/Models/User'
+import TransactionException from 'App/Exceptions/TransactionException'
+import AuthSignInValidator from 'App/Validators/Auth/AuthSignInValidator'
+import ApiToken from 'App/Models/ApiToken'
+
+export default class AuthController {
+  public async signUp(ctx: HttpContextContract) {
+    const { request, response } = ctx
+
+    try {
+      await request.validate(AuthSignUpValidator)
+    } catch (Err) {
+      return new ValidatorException(ctx, Err)
+    }
+
+    const {
+      email,
+      username,
+      password,
+    } = request.body()
+
+    const trx = await Database.transaction()
+
+    try {
+      await User.create({
+        email,
+        username,
+        password,
+      })
+
+      await trx.commit()
+    } catch (Err) {
+      await trx.rollback()
+
+      return new TransactionException(ctx, Err)
+    }
+
+    return response.ok({
+      status: 'Success',
+      message: 'Registro exitoso',
+      data: null,
+    })
+  }
+
+  public async signIn(ctx: HttpContextContract) {
+    const { auth, request, response } = ctx
+
+    try {
+      await request.validate(AuthSignInValidator)
+    } catch (Err) {
+      return new ValidatorException(ctx, Err)
+    }
+
+    const { email, password } = request.body()
+
+    try {
+      await auth.use('api').verifyCredentials(email, password)
+    } catch (error) {
+      return response.badRequest({
+        status: 'Error',
+        message: 'Credenciales incorrectas',
+        data: null
+      })
+    }
+
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return response.notFound({
+        status: 'Error',
+        message: 'Usuario no encontrado',
+        data: null
+      })
+    }
+
+    const {
+      type,
+      token,
+      expiresAt
+    } = await auth.use('api').attempt(email, password, {
+      expiresIn: '1 year'
+    })
+
+    const expires = expiresAt
+      ?.setZone('America/Mexico_City')
+      ?.toFormat('yyyy-MM-dd HH:mm:ss')
+
+    return response.ok({
+      status: 'Éxito',
+      message: 'Inicio de sesión éxitoso',
+      data: {
+        type,
+        token,
+        expiresAt: expires ?? null,
+      }
+    })
+  }
+
+  public async signOut({ auth, request, response }: HttpContextContract) {
+    const { id } = (
+      auth.use('api').user
+    ) as any
+
+    await auth.use('api').revoke()
+
+    const revokeAll = Boolean(
+      request.input('revokeAll')
+    )
+
+    if (!revokeAll) {
+      return response.ok({
+        status: 'Éxito',
+        message: 'Cierre de sesión éxitoso',
+        data: null
+      })
+    }
+
+    await ApiToken.query()
+      .where({ user_id: id })
+      .delete()
+
+    const revoked = await ApiToken.query()
+      .where({ user_id: id })
+
+    return response.ok({
+      status: 'Éxito',
+      message: 'Sesiones cerradas éxitosamente',
+      data: {
+        tokensRevoked: revoked.length == 0,
+      }
+    })
+  }
+
+  public async me({ auth, response }: HttpContextContract) {
+    const { id, email } = (
+      auth.use('api').user
+    ) as any
+
+    const user = (
+      await User.query()
+        .where({ id, email })
+        .first()
+    ) as User
+
+    return response.ok({
+      status: 'Éxito',
+      message: 'Datos del usuario actual',
+      data: user
+    })
+  }
+}
