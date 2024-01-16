@@ -1,18 +1,18 @@
-import AuthSignUpValidator from 'App/Validators/Auth/AuthSignUpValidator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import ValidatorException from 'App/Exceptions/ValidatorException'
 import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
 import TransactionException from 'App/Exceptions/TransactionException'
-import AuthSignInValidator from 'App/Validators/Auth/AuthSignInValidator'
 import ApiToken from 'App/Models/ApiToken'
+import AuthLoginValidator from 'App/Validators/Auth/AuthLoginValidator'
+import AuthRegisterValidator from 'App/Validators/Auth/AuthRegisterValidator'
 
 export default class AuthController {
-  public async signUp(ctx: HttpContextContract) {
+  public async register(ctx: HttpContextContract) {
     const { request, response } = ctx
 
     try {
-      await request.validate(AuthSignUpValidator)
+      await request.validate(AuthRegisterValidator)
     } catch (Err) {
       return new ValidatorException(ctx, Err)
     }
@@ -46,11 +46,11 @@ export default class AuthController {
     })
   }
 
-  public async signIn(ctx: HttpContextContract) {
+  public async login(ctx: HttpContextContract) {
     const { auth, request, response } = ctx
 
     try {
-      await request.validate(AuthSignInValidator)
+      await request.validate(AuthLoginValidator)
     } catch (Err) {
       return new ValidatorException(ctx, Err)
     }
@@ -100,7 +100,7 @@ export default class AuthController {
     })
   }
 
-  public async signOut({ auth, request, response }: HttpContextContract) {
+  public async logout({ auth, request, response }: HttpContextContract) {
     const { id } = (
       auth.use('api').user
     ) as any

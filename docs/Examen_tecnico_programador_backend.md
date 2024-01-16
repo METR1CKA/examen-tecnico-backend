@@ -39,4 +39,4 @@ El examen es el siguiente:
 
   - Número de artículos que no se encuentran en el API, y en estos regresará un listado de los mismos
 
-5. El examen terminará al ejecutar 2 veces el código, indicará que no hay cambios. 
+5. El examen terminará al ejecutar 2 veces el código, indicará que no hay cambios.
