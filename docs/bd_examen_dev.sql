@@ -10,7 +10,7 @@ CREATE TABLE
         `xnprp_categoria` varchar(42) DEFAULT NULL,
         `xnprp_marca` varchar(42) DEFAULT NULL,
         `xnprp_referencia` varchar(64) DEFAULT NULL,
-        `xnprp_nombre` varchar(200) DEFAULT NULL,
+        `xnprp_nombre` TEXT DEFAULT NULL,
         `xnprp_sku` varchar(64) DEFAULT NULL,
         `xnprp_existencia` int(11) NOT NULL DEFAULT '0',
         `xnprp_costo` decimal(24, 6) unsigned DEFAULT NULL,
