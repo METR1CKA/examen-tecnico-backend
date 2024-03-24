@@ -9,7 +9,7 @@ export default class ProductsController {
     const products = await Product.all()
 
     if (prop && value) {
-      if (!Product.includeProperty({ prop })) {
+      if (!Product.includeProperty({ property: prop })) {
         return response.badRequest({
           status: 'Error',
           message: 'La propiedad no existe',
@@ -23,7 +23,7 @@ export default class ProductsController {
 
       const product = Product.finder({
         data: products,
-        prop,
+        property: prop,
         value
       })
 
@@ -98,11 +98,10 @@ export default class ProductsController {
         await product.merge({
           xnprp_categoria: apiProduct.categoria_nombre,
           xnprp_marca: apiProduct.marca_nombre,
-          xnprp_nombre: apiProduct.nombre.substring(0, 200), // Truncar a 200 caracteres
+          xnprp_nombre: apiProduct.nombre,
           xnprp_existencia: parseInt(apiProduct.stock),
           xnprp_costo: parseFloat(apiProduct.precio)
         }).save()
-
 
         // Incrementar el contador de productos actualizados
         updated_products++
@@ -121,7 +120,7 @@ export default class ProductsController {
         xnprp_categoria: apiProduct.categoria_nombre,
         xnprp_marca: apiProduct.marca_nombre,
         xnprp_referencia: referencia,
-        xnprp_nombre: apiProduct.nombre.substring(0, 200), // Truncar a 200 caracteres
+        xnprp_nombre: apiProduct.nombre,
         xnprp_existencia: parseInt(apiProduct.stock),
         xnprp_costo: parseFloat(apiProduct.precio)
       })

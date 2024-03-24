@@ -67,17 +67,17 @@ export default class Product extends BaseModel {
   })
   public fecha_modificacion?: DateTime | null
 
-  public static includeProperty({ prop }: { prop: string }) {
-    return this.key_props.includes(prop)
+  public static includeProperty({ property }: { property: string }) {
+    return this.key_props.includes(property)
   }
 
   public static avaibleProperties() {
     return this.key_props
   }
 
-  public static async finder({ data, prop, value }: { data: any[]; prop: string; value: number }) {
+  public static async finder({ data, property, value }: { data: any[]; property: string; value: number }) {
     const data_indexed = data.reduce((acc: any, item: any) => {
-      acc[item[prop]] = item
+      acc[item[property]] = item
       return acc
     }, {})
 

@@ -77,6 +77,10 @@ export default class AuthController {
       })
     }
 
+    await ApiToken.query()
+      .where({ user_id: user.id })
+      .delete()
+
     const {
       type,
       token,
